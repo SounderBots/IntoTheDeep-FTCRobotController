@@ -2,9 +2,10 @@ package org.firstinspires.ftc.teamcode.opmodes.autonomous.red;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
+import org.firstinspires.ftc.teamcode.opmodes.autonomous.TaskUtil;
 import org.firstinspires.ftc.teamcode.opmodes.autonomous.base.AutoOpModeBase;
 
-@Autonomous(name = "_Red > Start F2", group = "Red alliance", preselectTeleOp="MainTeleOp")
+@Autonomous(name = "_Red > Start F2", group = "Red alliance", preselectTeleOp="MainTeleop")
 public class Red_F3 extends AutoOpModeBase {
 
     @Override
@@ -47,6 +48,33 @@ public class Red_F3 extends AutoOpModeBase {
     }
 
     private void DeliverSample() {
+//        deliverSampleInSequence();
+        deliverSampleInParallel();
+    }
+
+    private void deliverSampleInParallel() {
+        TaskUtil.runInParallel(
+                () -> {
+                    driveTrain.DriveToTarget(270, 400);
+                    driveTrain.TurnAngle(125);
+                },
+                () -> pivot.MoveToDeliveryInAuto()
+        );
+
+        slider.ExtendMaxInAuto();
+
+        driveTrain.DriveToTarget(80, 400);
+
+        rollingIntake.OuttakeInAuto();
+        Wait(300);
+        rollingIntake.HoldInAuto();
+
+        driveTrain.DriveToTarget(300, 400);
+        slider.CollapseMinInAuto();
+        pivot.MoveToStartInAuto();
+    }
+
+    private void deliverSampleInSequence() {
         driveTrain.DriveToTarget(270, 400);
         driveTrain.TurnAngle(125);
 
@@ -56,7 +84,7 @@ public class Red_F3 extends AutoOpModeBase {
         driveTrain.DriveToTarget(80, 400);
 
         rollingIntake.OuttakeInAuto();
-        Wait(00);
+        Wait(300);
         rollingIntake.HoldInAuto();
 
         driveTrain.DriveToTarget(300, 400);

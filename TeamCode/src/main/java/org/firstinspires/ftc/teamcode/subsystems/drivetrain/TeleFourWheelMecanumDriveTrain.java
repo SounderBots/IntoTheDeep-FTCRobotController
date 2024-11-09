@@ -93,4 +93,8 @@ public class TeleFourWheelMecanumDriveTrain extends FourWheelMecanumDrive {
         }
     }
 
+    @Override
+    protected boolean shouldRevertMotor() {
+        return false;
+    }
 }
