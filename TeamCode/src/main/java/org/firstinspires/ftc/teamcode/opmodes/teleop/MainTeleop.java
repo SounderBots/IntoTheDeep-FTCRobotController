@@ -9,6 +9,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.command.SounderBotBaseRunCommand;
 import org.firstinspires.ftc.teamcode.opmodes.OpModeTemplate;
+import org.firstinspires.ftc.teamcode.subsystems.climb.HangingArm;
 import org.firstinspires.ftc.teamcode.subsystems.delivery.DeliveryPivot;
 import org.firstinspires.ftc.teamcode.subsystems.delivery.DeliverySlider;
 import org.firstinspires.ftc.teamcode.subsystems.feedback.DriverFeedback;
@@ -35,6 +36,7 @@ public class MainTeleop extends OpModeTemplate {
         DeliverySlider deliverySlider = new DeliverySlider(hardwareMap, operatorGamepad, telemetry, feedback);
         RollingIntake rollingIntake = new RollingIntake(hardwareMap, operatorGamepad, telemetry, feedback);
         LimeLight limeLight = new LimeLight(hardwareMap, telemetry);
+        HangingArm hangingArm = new HangingArm(hardwareMap, telemetry, driverGamepad, feedback);
 
         driveTrain = new TeleFourWheelMecanumDriveTrain(hardwareMap, driverGamepad, telemetry, feedback, limeLight);
 
@@ -103,6 +105,13 @@ public class MainTeleop extends OpModeTemplate {
         driverGamepad.getGamepadButton(GamepadKeys.Button.LEFT_BUMPER)
                 .whenPressed(new InstantCommand(driveTrain::AlignTy, driveTrain));
 
+        driverGamepad.getGamepadButton(GamepadKeys.Button.Y)
+                .whenHeld(new InstantCommand(hangingArm::collapse, hangingArm))
+                .whenReleased(new InstantCommand(hangingArm::hold, hangingArm));
+
+        driverGamepad.getGamepadButton(GamepadKeys.Button.X)
+                .whenHeld(new InstantCommand(hangingArm::extend, hangingArm))
+                .whenReleased(new InstantCommand(hangingArm::hold, hangingArm));
         // DRIVER Actions
 
         // Drivetrain speed
