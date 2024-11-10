@@ -92,7 +92,7 @@ public class DeliverySlider extends SonicSubsystemBase {
 
         double position = motor.encoder.getPosition();
 
-        Log.i(LOG_TAG, "Slider position: " + position);
+        Log.i(LOG_TAG, "Slider position: " + position + ", current shadow/limit = " + currentShadow + "/" + shadowLimit);
         //telemetry.addData("target", currentTarget);
         //telemetry.addData("current", position);
         //telemetry.addData("telop", isTeleop);
@@ -162,7 +162,7 @@ public class DeliverySlider extends SonicSubsystemBase {
 
     public void updateCurrentShadowLimit(double currentAngle) {
         // if current angle is less than pi/4 (or 45 degree) then reset
-        if (currentAngle > Math.PI / 4) {
+        if (currentAngle < Math.PI / 4) {
             currentShadow = 0;
             overShadowLimit = false;
         } else {

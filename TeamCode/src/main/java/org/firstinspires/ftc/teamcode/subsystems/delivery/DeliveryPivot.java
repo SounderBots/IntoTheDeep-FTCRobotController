@@ -133,6 +133,7 @@ public class DeliveryPivot extends SonicSubsystemBase {
 
         double position = motor.encoder.getPosition();
         Log.i(LOG_TAG, "Pivot position: " + position);
+        Log.i(LOG_TAG, "Pivot angle: " + Units.radiansToDegrees(currentAngleFromLevel()));
 
         if (!isCurrentPositionWithinLimit()) {
             motor.stopMotor();
