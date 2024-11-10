@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.subsystems.delivery;
 
+import android.util.Log;
+
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -8,11 +10,13 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.subsystems.SonicSubsystemBase;
 import org.firstinspires.ftc.teamcode.subsystems.feedback.DriverFeedback;
 import org.firstinspires.ftc.teamcode.util.SonicPIDController;
+import org.firstinspires.ftc.teamcode.util.Units;
 
 import java.util.Set;
 
 public class DeliveryPivot extends SonicSubsystemBase {
 
+    private static final String LOG_TAG = LogTags.LOG_TAG_ARM_CONTROL;
     private Motor motor;
 
     private Telemetry telemetry;
@@ -38,6 +42,8 @@ public class DeliveryPivot extends SonicSubsystemBase {
 
     SonicPIDController pidController;
 
+    private boolean checkLimit = false;
+
     public DeliveryPivot(HardwareMap hardwareMap, GamepadEx gamepad, Telemetry telemetry, DriverFeedback feedback) {
         /* instantiate motors */
         this.motor  = new Motor(hardwareMap, "DeliveryPivot");
@@ -62,22 +68,37 @@ public class DeliveryPivot extends SonicSubsystemBase {
 
     public void RotateTowardsIntake() {
         SetTelop();
-        motor.set(-1);
+        setMotorOutputWithLimit(-1);
     }
 
     public void RotateTowardsDelivery() {
         SetTelop();
-        motor.set(1);
+        setMotorOutputWithLimit(1);
     }
 
     public void RotateTowardsIntakeSlowly() {
         SetTelop();
-        motor.set(-.33);
+        setMotorOutputWithLimit(-.33);
     }
 
     public void RotateTowardsDeliverySlowly() {
         SetTelop();
-        motor.set(.33);
+        setMotorOutputWithLimit(-.33);
+    }
+
+    private boolean isCurrentPositionWithinLimit() {
+        if (checkLimit) {
+            final double currentPos = motor.encoder.getPosition();
+            return currentPos > SampleIntakePositionFromStart && currentPos < DeliveryPositionFromStart;
+        } else {
+            return true;
+        }
+    }
+
+    private void setMotorOutputWithLimit(double output) {
+        if (isCurrentPositionWithinLimit()) {
+            motor.set(output);
+        }
     }
 
     public void HoldArm() {
@@ -111,10 +132,15 @@ public class DeliveryPivot extends SonicSubsystemBase {
         super.periodic();
 
         double position = motor.encoder.getPosition();
+        Log.i(LOG_TAG, "Pivot position: " + position);
+
+        if (!isCurrentPositionWithinLimit()) {
+            motor.stopMotor();
+            return;
+        }
         //telemetry.addData("target", currentTarget);
         //telemetry.addData("current", position);
         //telemetry.addData("telop", isTeleop);
-
         if(!isTeleop) {
             double power = pidController.calculatePIDAlgorithm(currentTarget - position);
             //telemetry.addData("power", power);
@@ -190,4 +216,13 @@ public class DeliveryPivot extends SonicSubsystemBase {
         motor.set(0);
     }
 
+    public void setCheckLimit(boolean checkLimit) {
+        this.checkLimit = checkLimit;
+    }
+
+    // assume IntakePositionFromStart is level, and DeliveryPositionFromStart is 90 degree
+    public double currentAngleFromLevel() {
+        final double currentPos = motor.encoder.getPosition();
+        return (currentPos - IntakePositionFromStart) / (DeliveryPositionFromStart - IntakePositionFromStart) * Math.PI / 2;
+    }
 }

@@ -117,4 +117,9 @@ public class AutoFourWheelMecanumDriveTrain extends FourWheelMecanumDrive {
         return new Pose2d(pose2D.getX(DistanceUnit.METER), pose2D.getY(DistanceUnit.METER),
                 new Rotation2d(pose2D.getHeading(AngleUnit.RADIANS)));
     }
+
+    @Override
+    protected boolean shouldRevertMotor() {
+        return true;
+    }
 }

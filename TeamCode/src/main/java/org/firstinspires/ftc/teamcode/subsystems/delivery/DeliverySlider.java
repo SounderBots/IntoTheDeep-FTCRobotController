@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.subsystems.delivery;
 
+import android.util.Log;
+
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -11,6 +13,7 @@ import org.firstinspires.ftc.teamcode.util.SonicPIDController;
 
 public class DeliverySlider extends SonicSubsystemBase {
 
+    private static final String LOG_TAG = LogTags.LOG_TAG_ARM_CONTROL;
     private Motor motor;
 
     private Telemetry telemetry;
@@ -19,8 +22,8 @@ public class DeliverySlider extends SonicSubsystemBase {
 
     private DriverFeedback feedback;
 
-    private int BasketDeliveryPosition = -3300;
-    private int CollapsedPosition = -100;
+    public static final int BasketDeliveryPosition = -3300;
+    public static final int CollapsedPosition = -100;
 
     private int currentTarget = 0;
 
@@ -28,6 +31,11 @@ public class DeliverySlider extends SonicSubsystemBase {
 
     private boolean isTeleop = true;
 
+    private static final int shadowLimit = 2000;
+
+    private double currentShadow = 0;
+
+    private boolean overShadowLimit = false;
     public DeliverySlider(HardwareMap hardwareMap, GamepadEx gamepad, Telemetry telemetry, DriverFeedback feedback) {
         /* instantiate motors */
         this.motor  = new Motor(hardwareMap, "DeliverySlider");
@@ -60,6 +68,7 @@ public class DeliverySlider extends SonicSubsystemBase {
 
     public void Collapse() {
         SetTelop();
+        overShadowLimit = false;
         motor.set(-1);
     }
 
@@ -82,6 +91,8 @@ public class DeliverySlider extends SonicSubsystemBase {
         super.periodic();
 
         double position = motor.encoder.getPosition();
+
+        Log.i(LOG_TAG, "Slider position: " + position);
         //telemetry.addData("target", currentTarget);
         //telemetry.addData("current", position);
         //telemetry.addData("telop", isTeleop);
@@ -105,6 +116,12 @@ public class DeliverySlider extends SonicSubsystemBase {
                 }
 
                 motor.set(power);
+            }
+        } else {
+
+            // expanding and over shadow limit
+            if (motor.get() > 0 && overShadowLimit) {
+                motor.stopMotor();
             }
         }
 
@@ -142,4 +159,16 @@ public class DeliverySlider extends SonicSubsystemBase {
             }
         }
     }
+
+    public void updateCurrentShadowLimit(double currentAngle) {
+        // if current angle is less than pi/4 (or 45 degree) then reset
+        if (currentAngle > Math.PI / 4) {
+            currentShadow = 0;
+            overShadowLimit = false;
+        } else {
+            currentShadow = Math.abs(Math.cos(currentAngle) * motor.encoder.getPosition() - CollapsedPosition);
+            overShadowLimit = currentShadow >= shadowLimit;
+        }
+    }
+
 }

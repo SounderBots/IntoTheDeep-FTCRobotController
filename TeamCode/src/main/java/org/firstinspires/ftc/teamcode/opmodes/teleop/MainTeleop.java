@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.opmodes.teleop;
 
 import com.arcrobotics.ftclib.command.InstantCommand;
+import com.arcrobotics.ftclib.command.RunCommand;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.command.button.Trigger;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
@@ -30,6 +31,7 @@ public class MainTeleop extends OpModeTemplate {
 
         DriverFeedback feedback = new DriverFeedback(hardwareMap, driverGamepad, operatorGamepad, telemetry);
         DeliveryPivot deliveryPivot = new DeliveryPivot(hardwareMap, operatorGamepad, telemetry, feedback);
+        deliveryPivot.setCheckLimit(true);
         DeliverySlider deliverySlider = new DeliverySlider(hardwareMap, operatorGamepad, telemetry, feedback);
         RollingIntake rollingIntake = new RollingIntake(hardwareMap, operatorGamepad, telemetry, feedback);
         LimeLight limeLight = new LimeLight(hardwareMap, telemetry);
@@ -125,6 +127,10 @@ public class MainTeleop extends OpModeTemplate {
 
         // update telemetry every loop
         schedule(SounderBotBaseRunCommand.createTelemetryEnabledOnlyInstance(telemetry));
+        schedule(new RunCommand(() -> {
+            double currentAngle = deliveryPivot.currentAngleFromLevel();
+            deliverySlider.updateCurrentShadowLimit(currentAngle);
+        }));
     }
 
     @Override
