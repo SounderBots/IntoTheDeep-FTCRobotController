@@ -6,6 +6,7 @@ import com.arcrobotics.ftclib.command.Command;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 
+import org.firstinspires.ftc.teamcode.opmodes.OpModeTemplate;
 import org.firstinspires.ftc.teamcode.opmodes.autonomous.command.CommandFactory;
 import org.firstinspires.ftc.teamcode.subsystems.delivery.DeliveryPivot;
 import org.firstinspires.ftc.teamcode.subsystems.delivery.DeliverySlider;
@@ -16,7 +17,7 @@ import org.firstinspires.ftc.teamcode.subsystems.vision.LimeLight;
 
 import java.util.List;
 
-public abstract class CommandAutoOpMode extends CommandOpMode {
+public abstract class CommandAutoOpMode extends OpModeTemplate {
     protected CommandFactory commandFactory;
 
     @Override
@@ -24,9 +25,10 @@ public abstract class CommandAutoOpMode extends CommandOpMode {
         GamepadEx driverGamePad = new GamepadEx(gamepad1);
         GamepadEx operatorGamePad = new GamepadEx(gamepad2);
 
+
         Intent launchIntent = hardwareMap.appContext.getPackageManager().getLaunchIntentForPackage(hardwareMap.appContext.getPackageName());
         assert launchIntent != null;
-        final boolean barebone = launchIntent.getBooleanExtra("barebone", false);
+        final boolean barebone = launchIntent.getBooleanExtra("barebone", true);
         DriverFeedback feedback = barebone ? null : new DriverFeedback(hardwareMap, driverGamePad, operatorGamePad, telemetry);
         LimeLight limeLight = barebone ? null : new LimeLight(hardwareMap, telemetry);
         AutoMecanumDriveTrain driveTrain = new AutoMecanumDriveTrain(hardwareMap, driverGamePad, telemetry, null, limeLight);
