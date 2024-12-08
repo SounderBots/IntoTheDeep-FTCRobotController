@@ -1,6 +1,8 @@
 package org.firstinspires.ftc.teamcode.opmodes.autonomous.command;
 
 import com.arcrobotics.ftclib.command.InstantCommand;
+import com.arcrobotics.ftclib.command.ParallelDeadlineGroup;
+import com.arcrobotics.ftclib.command.ParallelRaceGroup;
 import com.arcrobotics.ftclib.controller.PIDController;
 import com.arcrobotics.ftclib.controller.wpilibcontroller.ProfiledPIDController;
 import com.arcrobotics.ftclib.trajectory.TrajectoryConfig;
@@ -65,12 +67,15 @@ public class CommandFactory {
     }
 
     public DriveToTargetCommand driveToTarget(double targetX, double targetY, double targetHeading, double minPower) {
-        return new DriveToTargetCommand(driveTrain, telemetry, targetX, targetY, targetHeading, minPower, 20);
+        return new DriveToTargetCommand(driveTrain, telemetry, targetX, targetY, targetHeading, minPower, 1.0, 20);
     }
 
-
     public DriveToTargetCommand driveToTarget(double targetX, double targetY, double targetHeading, double minPower, double distanceTolerance) {
-        return new DriveToTargetCommand(driveTrain, telemetry, targetX, targetY, targetHeading, minPower, distanceTolerance);
+        return new DriveToTargetCommand(driveTrain, telemetry, targetX, targetY, targetHeading, minPower, 1.0, distanceTolerance);
+    }
+
+    public DriveToTargetCommand driveToTarget(double targetX, double targetY, double targetHeading, double minPower, double maxPower, double distanceTolerance) {
+        return new DriveToTargetCommand(driveTrain, telemetry, targetX, targetY, targetHeading, minPower, maxPower, distanceTolerance);
     }
 
     public DriveToTargetCommand driveToTarget(double targetX, double targetY, double targetHeading) {
@@ -100,6 +105,14 @@ public class CommandFactory {
         return moveSliderCommand;
     }
 
+    public MoveSliderCommand extendSliderToSpeciment() {
+        return new MoveSliderCommand(slider, telemetry, DeliverySlider.StartPosition);
+    }
+
+    public MoveSliderCommand extendSliderToDeliverSpeciman() {
+        return new MoveSliderCommand(slider, telemetry, DeliverySlider.StartPosition-600);
+    }
+
     public MoveSliderCommand collapseSlider() {
         return new MoveSliderCommand(slider, telemetry, DeliverySlider.CollapsedPosition, true);
     }
@@ -116,6 +129,10 @@ public class CommandFactory {
         return new MovePivotCommand(pivot, telemetry, DeliveryPivot.IntakePositionFromStart);
     }
 
+    public MovePivotCommand pivotToSpecimenInTake() {
+        return new MovePivotCommand(pivot, telemetry, DeliveryPivot.IntakePositionFromStart - 250);
+    }
+
     public MovePivotCommand pivotToGroundInTakeBegin() {
         return new MovePivotCommand(pivot, telemetry, DeliveryPivot.IntakePositionFromStart + 200);
     }
@@ -129,16 +146,25 @@ public class CommandFactory {
         return new MovePivotCommand(pivot, telemetry, DeliveryPivot.DeliveryPositionFromStart);
     }
 
-    public InstantCommand stopDriveTrain() {
-        return new InstantCommand(driveTrain::stop, driveTrain);
+    public MovePivotCommand pivotToSpecimenDelivery() {
+        return new MovePivotCommand(pivot, telemetry, DeliveryPivot.StartPositionFromStart - 55);
+
     }
 
-    public InstantCommand elbowToIntakePosition() {
-        return new InstantCommand(intake::SetElbowInIntakePosition);
+    public SingleRunCommand stopDriveTrain() {
+        return new SingleRunCommand(driveTrain::stop, driveTrain);
     }
 
-    public InstantCommand elbowToSpecimenPosition() {
-        return new InstantCommand(intake::SetElbowInSampleDeliveryPosition);
+    public SingleRunCommand elbowToIntakePosition() {
+        return new SingleRunCommand(intake::SetElbowInIntakePosition);
+    }
+
+    public SingleRunCommand elbowToDeliveryPosition() {
+        return new SingleRunCommand(intake::SetElbowInSampleDeliveryPosition);
+    }
+
+    public SingleRunCommand elbowToSpecimenPosition() {
+        return new SingleRunCommand(intake::SetElbowInSampleDeliveryPosition);
     }
 
     public SmartIntakeCommand intake() {

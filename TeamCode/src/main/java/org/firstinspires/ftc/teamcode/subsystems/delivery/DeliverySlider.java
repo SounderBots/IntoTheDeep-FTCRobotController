@@ -26,7 +26,9 @@ public class DeliverySlider extends SonicSubsystemBase {
     public static int BasketDeliveryPosition = -2300;
     public static int CollapsedPosition = -90;
 
-    private int ExtendLimit = -1100;
+    public static int StartPosition = -400;
+
+    private int ExtendLimit = -880;
 
     private int currentTarget = 0;
 
@@ -95,7 +97,7 @@ public class DeliverySlider extends SonicSubsystemBase {
 
     public void MoveToDeliverySpecimanPosition() {
         SetAuto();
-        currentTarget = -400;
+        currentTarget = StartPosition;
     }
 
     public void MoveToDeliverySamplePosition() {
@@ -137,6 +139,13 @@ public class DeliverySlider extends SonicSubsystemBase {
             }
         } else {
 //            Log.i("armControl", "low enough? " + pivotLowEnoughSupplier == null ? "null" : (pivotLowEnoughSupplier.get() ? "yes" : "no"));
+
+//            telemetry.addData("slider", position);
+//            telemetry.addData("pivot supplier", pivotLowEnoughSupplier.get());
+//            telemetry.addData("motor", motor.get());
+//            telemetry.update();
+
+
             if (pivotLowEnoughSupplier != null
                     && pivotLowEnoughSupplier.get()
                     && Math.abs(motor.get()) > 0
