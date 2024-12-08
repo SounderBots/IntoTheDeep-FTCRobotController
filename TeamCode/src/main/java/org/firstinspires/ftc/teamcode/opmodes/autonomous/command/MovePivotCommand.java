@@ -38,21 +38,15 @@ public class MovePivotCommand extends SounderBotCommandBase{
     public void doExecute() {
         position = motor.encoder.getPosition();
         double power = pidController.calculatePIDAlgorithm(target - position);
-        if (isTargetReached()) {
-            motor.set(0);
-            finished = true;
-        } else {
-            double minPower = .2;
+        double minPower = .2;
 
-            if (Math.abs(power) < minPower) {
-                //telemetry.addData("minPower", true);
+        if (Math.abs(power) < minPower) {
+            //telemetry.addData("minPower", true);
 
-                power = minPower * Math.abs(power) / power;
-            }
-
-            motor.set(power);
+            power = minPower * Math.abs(power) / power;
         }
 
+        motor.set(power);
         previousPosition = position;
     }
 }

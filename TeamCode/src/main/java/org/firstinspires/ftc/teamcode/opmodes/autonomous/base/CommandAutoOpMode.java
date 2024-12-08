@@ -35,6 +35,12 @@ public abstract class CommandAutoOpMode extends CommandOpMode {
         DeliverySlider slider = barebone ? null : new DeliverySlider(hardwareMap, operatorGamePad, telemetry, feedback);
 
         commandFactory = new CommandFactory(telemetry, driveTrain, rollingIntake, limeLight, pivot,slider);
+        commandFactory.setCommandScheduler(new CommandScheduler() {
+            @Override
+            public void schedule(Command command) {
+                schedule(command);
+            }
+        });
         schedule(createCommand());
     }
 

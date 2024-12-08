@@ -6,8 +6,8 @@ import com.arcrobotics.ftclib.controller.wpilibcontroller.ProfiledPIDController;
 import com.arcrobotics.ftclib.trajectory.TrajectoryConfig;
 import com.arcrobotics.ftclib.trajectory.TrapezoidProfile;
 
-import org.firstinspires.ftc.robotcore.external.Supplier;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.opmodes.autonomous.base.CommandScheduler;
 import org.firstinspires.ftc.teamcode.subsystems.delivery.DeliveryPivot;
 import org.firstinspires.ftc.teamcode.subsystems.delivery.DeliverySlider;
 import org.firstinspires.ftc.teamcode.subsystems.drivetrain.AutoMecanumDriveTrain;
@@ -37,6 +37,8 @@ public class CommandFactory {
     private final DeliveryPivot pivot;
     private final DeliverySlider slider;
 
+    private CommandScheduler commandScheduler;
+
     public CommandFactory(Telemetry telemetry, AutoMecanumDriveTrain driveTrain, RollingIntake intake, LimeLight vision, DeliveryPivot pivot, DeliverySlider slider) {
         this.driveTrain = driveTrain;
         this.intake = intake;
@@ -44,6 +46,10 @@ public class CommandFactory {
         this.telemetry = telemetry;
         this.pivot = pivot;
         this.slider = slider;
+    }
+
+    public void setCommandScheduler(CommandScheduler commandScheduler) {
+        this.commandScheduler = commandScheduler;
     }
 
     public AlignToSample alignToSample() {
@@ -87,8 +93,11 @@ public class CommandFactory {
         return new MoveSliderCommand(slider, telemetry, DeliverySlider.BasketDeliveryPosition);
     }
 
-    public MoveSliderCommand extendSlider(Supplier<Boolean> endHoldingSignalProvider) {
-        return new MoveSliderCommand(slider, telemetry, DeliverySlider.BasketDeliveryPosition).withEndAction(new MoveSliderCommand.EndAction(endHoldingSignalProvider));
+    public MoveSliderCommand extendSlider(SounderBotCommandBase onTargetReachedCommand) {
+        MoveSliderCommand moveSliderCommand = new MoveSliderCommand(slider, telemetry, DeliverySlider.BasketDeliveryPosition);
+        moveSliderCommand.registerOnTargetReachedHandler(callback ->
+                commandScheduler.schedule(onTargetReachedCommand.andThen(new InstantCommand(callback))));
+        return moveSliderCommand;
     }
 
     public MoveSliderCommand collapseSlider() {

@@ -130,7 +130,7 @@ public class MainTeleop extends OpModeTemplate {
                 .whenPressed(new InstantCommand(deliverySlider::ResetEncoder, deliverySlider));
 
         operatorGamepad.getGamepadButton(GamepadKeys.Button.RIGHT_STICK_BUTTON)
-                    .whenPressed(new MovePivotRelativelyCommand(deliveryPivot, MovePivotRelativelyCommand.Direction.ToPickup, deliveryPivot.DeliveryPositionFromStart - 400, telemetry)
+                    .whenPressed(new MovePivotRelativelyCommand(deliveryPivot, MovePivotRelativelyCommand.Direction.ToPickup, DeliveryPivot.DeliveryPositionFromStart - 400, telemetry)
                             .andThen(new InstantCommand(deliveryPivot::resetEncoder, deliveryPivot)));
 
 
