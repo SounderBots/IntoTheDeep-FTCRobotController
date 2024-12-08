@@ -50,22 +50,6 @@ public class AlignToSample extends SounderBotCommandBase {
                 telemetry.addData("ty: ", lastResult.getTy());
             }
 
-            if (isTargetReached()) {
-                // Give a 200ms to identify overshoot
-                sleep(200);
-                this.lastResult = limeLight.GetResult();
-
-                if (this.lastResult != null && isTargetReached()) {
-
-                    if (addTelemetry) {
-                        telemetry.addLine("Done");
-                    }
-
-                    finished = true;
-                    return;
-                }
-            }
-
             // Battery reading of 13.49 required a Kp of 0.015
             double x = xPid.calculatePIDAlgorithm(lastResult.getTx());
             double y = yPid.calculatePIDAlgorithm(lastResult.getTy());
@@ -89,8 +73,15 @@ public class AlignToSample extends SounderBotCommandBase {
 
     @Override
     protected boolean isTargetReached() {
-        return (Math.abs(lastResult.getTx()) < angleTolerance)
+        boolean positionReached = (Math.abs(lastResult.getTx()) < angleTolerance)
                 && (Math.abs(lastResult.getTy()) < angleTolerance);
+        if (!positionReached) {
+            return false;
+        }
+
+        sleep(200);
+        this.lastResult = limeLight.GetResult();
+        return lastResult != null;
     }
 
     @Override

@@ -10,6 +10,7 @@ public class IntakeCommand extends SounderBotCommandBase {
     private static final long TIME_OUT = 700; // 1 sec
     boolean expired = false;
     Timer timer = new Timer();
+
     public IntakeCommand(RollingIntake intake) {
         this.intake = intake;
         addRequirements(intake);
@@ -34,12 +35,12 @@ public class IntakeCommand extends SounderBotCommandBase {
 
     @Override
     public void doExecute() {
-        if (isTargetReached()) {
-            intake.HoldInAuto();
-            finished = true;
-        } else {
-            intake.IntakeInAuto();
-        }
+        intake.IntakeInAuto();
     }
 
+    @Override
+    public void onTargetReached(Runnable endCallback) {
+        intake.HoldInAuto();
+        super.onTargetReached(endCallback);
+    }
 }

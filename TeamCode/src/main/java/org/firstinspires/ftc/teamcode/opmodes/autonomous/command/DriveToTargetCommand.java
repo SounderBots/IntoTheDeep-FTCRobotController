@@ -67,22 +67,6 @@ public class DriveToTargetCommand extends SounderBotCommandBase {
 
         Log.i(LOG_TAG, String.format("tx=%f, ty=%f, x=%f, y=%f, heading=%f", targetX, targetY, odo.getPosX(), odo.getPosY(), Math.toDegrees(odo.getHeading())));
 
-        if(isTargetReached()) {
-            // Give a 200ms to identify overshoot
-            sleep(200);
-            odo.update();
-
-            if(isTargetReached()) {
-
-                if(addTelemetry) {
-                    telemetry.addLine("Done");
-                }
-
-                finished = true;
-                return;
-            }
-        }
-
         odo.update();
 
         // Battery reading of 13.49 required a Kp of 0.015
@@ -136,6 +120,15 @@ public class DriveToTargetCommand extends SounderBotCommandBase {
 
     @Override
     protected boolean isTargetReached() {
+        if (isPositionReached()) {
+            sleep(200);
+            odo.update();
+            return isPositionReached();
+        }
+        return false;
+    }
+
+    private boolean isPositionReached() {
         return (Math.abs(targetX - odo.getPosX()) < distanceTolerance)
                 && (Math.abs(targetY - odo.getPosY())) < distanceTolerance
                 && Math.abs(targetHeading - odo.getHeading()) < Math.toRadians(3);

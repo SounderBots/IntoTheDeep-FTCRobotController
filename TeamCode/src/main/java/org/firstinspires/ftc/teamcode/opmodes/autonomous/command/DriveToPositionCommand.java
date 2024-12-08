@@ -226,9 +226,6 @@ public class DriveToPositionCommand extends SounderBotCommandBase {
 
         drive.driveRobotCentric(yOutput, xOutput, rotOutput);
 
-        if (isTargetReached()) {
-            finished = true;
-        }
         updateTelemetry(currentX, currentY, currentHeading, xError, yError, rotError, xOutput, yOutput, rotOutput);
     }
 
