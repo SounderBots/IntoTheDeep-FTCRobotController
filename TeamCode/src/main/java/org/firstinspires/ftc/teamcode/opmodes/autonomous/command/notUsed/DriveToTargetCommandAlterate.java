@@ -1,16 +1,14 @@
-package org.firstinspires.ftc.teamcode.opmodes.autonomous.command;
+package org.firstinspires.ftc.teamcode.opmodes.autonomous.command.notUsed;
 
 import android.util.Log;
 
-import com.google.common.util.concurrent.Uninterruptibles;
-
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.opmodes.autonomous.command.SounderBotCommandBase;
 import org.firstinspires.ftc.teamcode.subsystems.drivetrain.AutoMecanumDriveTrain;
 import org.firstinspires.ftc.teamcode.subsystems.drivetrain.GoBildaPinpointDriver;
 import org.firstinspires.ftc.teamcode.util.SonicPIDFController;
 
-import java.util.concurrent.TimeUnit;
-
+// Not used
 public class DriveToTargetCommandAlterate extends SounderBotCommandBase {
 
     private static final String LOG_TAG = DriveToTargetCommandAlterate.class.getSimpleName();
@@ -55,7 +53,6 @@ public class DriveToTargetCommandAlterate extends SounderBotCommandBase {
             odo.update();
 
             if(isTargetReached()) {
-                finished = true;
                 return;
             }
         }

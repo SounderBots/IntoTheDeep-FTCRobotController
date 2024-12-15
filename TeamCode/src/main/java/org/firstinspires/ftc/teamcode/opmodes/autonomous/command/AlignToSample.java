@@ -90,7 +90,15 @@ public class AlignToSample extends SounderBotCommandBase {
     @Override
     protected boolean isTargetReached() {
         return (Math.abs(lastResult.getTx()) < angleTolerance)
-                && (Math.abs(lastResult.getTy()) < angleTolerance);
+                && (Math.abs(lastResult.getTy()) < angleTolerance)
+                && lastResult != null;
+    }
+
+    @Override
+    protected void onTargetReached() {
+        // Give a 200ms to identify overshoot
+        sleep(200);
+        this.lastResult = limeLight.GetResult();
     }
 
     @Override

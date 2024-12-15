@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.opmodes.autonomous.command;
+package org.firstinspires.ftc.teamcode.opmodes.autonomous.command.notUsed;
 
 import android.annotation.SuppressLint;
 import android.util.Log;
@@ -9,10 +9,12 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.teamcode.opmodes.autonomous.command.SounderBotCommandBase;
 import org.firstinspires.ftc.teamcode.subsystems.drivetrain.AutoMecanumDriveTrain;
 import org.firstinspires.ftc.teamcode.subsystems.drivetrain.GoBildaPinpointDriver;
 import org.firstinspires.ftc.teamcode.util.AngleTracker;
 
+// Not used
 public class DriveToPositionCommand extends SounderBotCommandBase {
     private static final String TAG = "DriveToPositionCmd";
 
@@ -227,7 +229,6 @@ public class DriveToPositionCommand extends SounderBotCommandBase {
         drive.driveRobotCentric(yOutput, xOutput, rotOutput);
 
         if (isTargetReached()) {
-            finished = true;
         }
         updateTelemetry(currentX, currentY, currentHeading, xError, yError, rotError, xOutput, yOutput, rotOutput);
     }

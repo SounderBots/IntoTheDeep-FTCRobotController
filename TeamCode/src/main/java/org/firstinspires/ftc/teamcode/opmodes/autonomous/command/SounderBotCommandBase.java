@@ -4,14 +4,14 @@ import android.util.Log;
 
 import com.arcrobotics.ftclib.command.CommandBase;
 
-import java.util.concurrent.atomic.AtomicBoolean;
-
 public abstract class SounderBotCommandBase extends CommandBase {
     private static final String LOG_TAG = SounderBotCommandBase.class.getSimpleName();
     boolean finished = false;
     long TIME_OUT_MS = 1500; // 4 seconds
 
     long startTime = -1;
+
+    private boolean onTargetReachedCalled = false;
 
     @Override
     public final boolean isFinished() {
@@ -29,9 +29,34 @@ public abstract class SounderBotCommandBase extends CommandBase {
                     onTimeout();
                 }
             } else {
-                doExecute();
+                if (!isTargetReached()) {
+                    doExecute();
+                } else {
+                    if (!onTargetReachedCalled) {
+                        onTargetReachedCalled = true;
+                        onTargetReached();
+                    }
+                    if (shouldFinishWhenTargetReached()) {
+                        finished = true;
+                        end(false);
+                    } else {
+                        afterTargetReached();
+                    }
+                }
             }
         }
+    }
+
+    protected boolean shouldFinishWhenTargetReached() {
+        return true;
+    }
+
+    protected void onTargetReached() {
+
+    }
+
+    protected void afterTargetReached() {
+
     }
 
     private boolean isTimeout() {
