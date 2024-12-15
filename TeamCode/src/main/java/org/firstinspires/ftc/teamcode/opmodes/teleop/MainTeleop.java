@@ -86,11 +86,11 @@ public class MainTeleop extends OpModeTemplate {
         );
         // Delivery Slider
         new Trigger(() -> gamepad2.left_stick_y > 0.5)
-                .whenActive(new InstantCommand(deliverySlider::Expand, deliverySlider))
+                .whenActive(new InstantCommand(deliverySlider::collapse, deliverySlider))
                 .whenInactive(new InstantCommand(deliverySlider::Hold, deliverySlider));
 
         new Trigger(() -> gamepad2.left_stick_y < -0.5)
-                .whenActive(new InstantCommand(deliverySlider::Collapse, deliverySlider))
+                .whenActive(new InstantCommand(deliverySlider::expand, deliverySlider))
                 .whenInactive(new InstantCommand(deliverySlider::Hold, deliverySlider));
 
         // Intake and Outtake

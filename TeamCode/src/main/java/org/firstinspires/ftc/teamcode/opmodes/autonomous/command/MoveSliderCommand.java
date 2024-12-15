@@ -27,8 +27,7 @@ public class MoveSliderCommand extends SounderBotCommandBase {
     Telemetry telemetry;
 
     double target;
-
-    Motor motor;
+     Motor motor;
 
     SonicPIDFController pidController;
 
@@ -64,12 +63,12 @@ public class MoveSliderCommand extends SounderBotCommandBase {
 
     @Override
     public void doExecute() {
-        position = motor.encoder.getPosition();
+        position = slider.getMotorsPosition();
         double power = pidController.calculatePIDAlgorithm(target - position);
 
         if(isTargetReached() || holdPosition != Integer.MIN_VALUE) {
             if (endAction == null) {
-                motor.set(0);
+                slider.setMotors(0);
                 finished = true;
                 telemetry.addLine("Done");
 
@@ -83,14 +82,14 @@ public class MoveSliderCommand extends SounderBotCommandBase {
                 }
 
                 if (endAction.stopMotorSignalProvider.get()) {
-                    motor.set(0);
+                    slider.setMotors(0);
                     finished = true;
                 } else {
                     telemetry.addLine("holding slider...");
                     if (Math.abs(holdPosition - motor.getCurrentPosition()) < 50) {
-                        motor.set(0);
+                        slider.setMotors(0);
                     } else {
-                        motor.set(holdingPower);
+                        slider.setMotors(holdingPower);
                     }
                 }
 

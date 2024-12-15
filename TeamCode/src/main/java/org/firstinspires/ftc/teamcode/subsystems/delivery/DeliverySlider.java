@@ -15,6 +15,22 @@ import java.util.function.Supplier;
 
 public class DeliverySlider extends SonicSubsystemBase {
 
+    private static final double FULL_POWER = 1d;
+    private static final double SLOW_POWER = 0.5d;
+    private static final double HOLD_POWER = .1d;
+
+    public enum Direction {
+        EXPAND (-1, 1),
+        COLLAPSE (1, -1);
+
+        final int motorDirection;
+        final int motor2Direction;
+
+        Direction(int motorDirection, int motor2Direction) {
+            this.motorDirection = motorDirection;
+            this.motor2Direction = motor2Direction;
+        }
+    }
     private Motor motor;
     private Motor motor2;
 
@@ -41,6 +57,8 @@ public class DeliverySlider extends SonicSubsystemBase {
     public static double recordedPosition;
 
     private Supplier<Boolean> pivotLowEnoughSupplier;
+
+    private Direction currentDirection;
 
     public DeliverySlider(HardwareMap hardwareMap, GamepadEx gamepad, Telemetry telemetry, DriverFeedback feedback) {
         /* instantiate motors */
@@ -69,33 +87,43 @@ public class DeliverySlider extends SonicSubsystemBase {
         this.isTeleop = false;
     }
 
-    public void Expand() {
+    public void collapse() {
         SetTelop();
-        motor.set(1);
-        motor2.set(-1);
-
+        setMotors(SLOW_POWER, Direction.COLLAPSE);
     }
 
-    public void Collapse() {
+    public void expand() {
         SetTelop();
-        motor.set(-1);
-        motor2.set(1);
+        if (pivotLowEnoughSupplier != null) {
+            double limit = pivotLowEnoughSupplier.get() ? ExtendLimit : BasketDeliveryPosition;
+            if (pivotLowEnoughSupplier.get()) {
+                setMotors(SLOW_POWER, Direction.EXPAND);
+            } else {
+                setMotors(almostFullyExpanded(limit) ? SLOW_POWER : FULL_POWER, Direction.EXPAND);
+            }
+        } else {
+            // default if no pivotLowEnoughSupplier
+            setMotors(FULL_POWER, Direction.EXPAND);
+        }
     }
 
     public void ExpandSlowly() {
         SetTelop();
-        motor.set(-.5);
+        setMotors(SLOW_POWER, Direction.EXPAND);
     }
 
     public void CollapseSlowly() {
         SetTelop();
-        motor.set(.3);
+        setMotors(.3, Direction.COLLAPSE);
     }
 
     public void Hold() {
         SetTelop();
-        motor.set(0);
-        motor2.set(0);
+        if (Direction.EXPAND == currentDirection && almostFullyExpanded(BasketDeliveryPosition)) {
+            setMotors(HOLD_POWER, currentDirection);
+        } else {
+            setMotors(0, currentDirection);
+        }
     }
 
     public void MoveToValidPosition() {
@@ -136,7 +164,7 @@ public class DeliverySlider extends SonicSubsystemBase {
             double power = pidController.calculatePIDAlgorithm(currentTarget - position);
 
             if(Math.abs(currentTarget - position) < 40) {
-                motor.set(0);
+                setMotors(0);
             }
             else {
                 double minPower = 0;
@@ -145,13 +173,13 @@ public class DeliverySlider extends SonicSubsystemBase {
                     power = minPower * Math.abs(power) / power;
                 }
 
-                motor.set(power);
+                setMotors(power);
             }
         } else {
-            Log.i("armControl", "low enough? " + pivotLowEnoughSupplier == null ? "null" : (pivotLowEnoughSupplier.get() ? "yes" : "no"));
+            //Log.i("armControl", "low enough? " + pivotLowEnoughSupplier == null ? "null" : (pivotLowEnoughSupplier.get() ? "yes" : "no"));
 
             telemetry.addData("slider", position);
-            telemetry.addData("pivot supplier", pivotLowEnoughSupplier.get());
+            //telemetry.addData("pivot supplier", pivotLowEnoughSupplier.get());
             telemetry.addData("motor", motor.get());
             telemetry.update();
 
@@ -160,7 +188,7 @@ public class DeliverySlider extends SonicSubsystemBase {
                     && pivotLowEnoughSupplier.get()
                     && Math.abs(motor.get()) > 0
                     && position < ExtendLimit) {
-                motor.stopMotor();
+                setMotors(0);
                 MoveToValidPosition();
 
             }
@@ -225,5 +253,24 @@ public class DeliverySlider extends SonicSubsystemBase {
 
     public SonicPIDFController getPidController() {
         return pidController;
+    }
+
+    public void setMotors(double power, Direction direction) {
+        motor.set(Math.abs(power) * direction.motorDirection);
+        motor2.set(Math.abs(power) * direction.motor2Direction);
+        currentDirection = direction;
+    }
+
+    public void setMotors(double power) {
+        motor.set(power);
+        motor2.set(-power);
+    }
+
+    public int getMotorsPosition() {
+        return (motor.getCurrentPosition() + motor2.getCurrentPosition()) / 2;
+    }
+
+    public boolean almostFullyExpanded(double limit) {
+        return Math.abs(((double)getMotorsPosition())/limit) > 0.9;
     }
 }
