@@ -90,6 +90,9 @@ public class DeliverySlider extends SonicSubsystemBase {
     public void collapse() {
         SetTelop();
         setMotors(SLOW_POWER, Direction.COLLAPSE);
+        motor.set(.5);
+        motor2.set(-.5);
+
     }
 
     public void expand() {
