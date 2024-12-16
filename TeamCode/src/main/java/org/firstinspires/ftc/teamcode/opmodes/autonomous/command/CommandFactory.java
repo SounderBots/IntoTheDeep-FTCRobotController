@@ -104,7 +104,7 @@ public class CommandFactory {
     }
 
     public MoveSliderCommand collapseSlider() {
-        return new MoveSliderCommand(slider, telemetry, DeliverySlider.CollapsedPosition, true);
+        return new MoveSliderCommand(slider, telemetry, DeliverySlider.CollapsedPosition + 100, true);
     }
 
     public TurnAngleRelativeCommand turnAngleRelative(double angleInDegrees) {

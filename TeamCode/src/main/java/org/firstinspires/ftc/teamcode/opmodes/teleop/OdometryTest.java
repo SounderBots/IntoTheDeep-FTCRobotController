@@ -33,7 +33,7 @@ public class OdometryTest extends OpModeTemplate {
         DriverFeedback feedback = new DriverFeedback(hardwareMap, driverGamepad, operatorGamepad, telemetry);
         RollingIntake rollingIntake = new RollingIntake(hardwareMap, operatorGamepad, telemetry, feedback);
         DeliveryPivot deliveryPivot = new DeliveryPivot(hardwareMap, operatorGamepad, telemetry, null, rollingIntake);
-        DeliverySlider slider = new DeliverySlider(hardwareMap, operatorGamepad, telemetry, null);
+        DeliverySlider slider = new DeliverySlider(hardwareMap, deliveryPivot, operatorGamepad, telemetry, null);
         LimeLight limeLight = new LimeLight(hardwareMap, telemetry);
         AutoMecanumDriveTrain driveTrain = new AutoMecanumDriveTrain(hardwareMap, driverGamepad, telemetry, null, limeLight);
 

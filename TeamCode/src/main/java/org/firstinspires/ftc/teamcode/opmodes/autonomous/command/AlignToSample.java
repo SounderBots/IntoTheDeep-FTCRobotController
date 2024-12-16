@@ -11,6 +11,8 @@ import java.util.concurrent.TimeUnit;
 
 public class AlignToSample extends SounderBotCommandBase {
 
+    boolean addTelemetry = false;
+
     private static final String LOG_TAG = AlignToSample.class.getSimpleName();
     double minPower = 0.03;
 
@@ -39,7 +41,6 @@ public class AlignToSample extends SounderBotCommandBase {
 
     @Override
     public void doExecute() {
-        boolean addTelemetry = false;
 
         this.lastResult = limeLight.GetResult();
 
@@ -48,22 +49,6 @@ public class AlignToSample extends SounderBotCommandBase {
             if (addTelemetry) {
                 telemetry.addData("tx: ", lastResult.getTx());
                 telemetry.addData("ty: ", lastResult.getTy());
-            }
-
-            if (isTargetReached()) {
-                // Give a 200ms to identify overshoot
-                sleep(200);
-                this.lastResult = limeLight.GetResult();
-
-                if (this.lastResult != null && isTargetReached()) {
-
-                    if (addTelemetry) {
-                        telemetry.addLine("Done");
-                    }
-
-                    finished = true;
-                    return;
-                }
             }
 
             // Battery reading of 13.49 required a Kp of 0.015
@@ -89,20 +74,24 @@ public class AlignToSample extends SounderBotCommandBase {
 
     @Override
     protected boolean isTargetReached() {
-        return (Math.abs(lastResult.getTx()) < angleTolerance)
-                && (Math.abs(lastResult.getTy()) < angleTolerance)
-                && lastResult != null;
+        if (isAngleReached()) {
+            sleep(200);
+            this.lastResult = limeLight.GetResult();
+            return lastResult == null && isAngleReached();
+        }
+        return false;
     }
 
-    @Override
-    protected void onTargetReached() {
-        // Give a 200ms to identify overshoot
-        sleep(200);
-        this.lastResult = limeLight.GetResult();
+    private boolean isAngleReached() {
+        return (Math.abs(lastResult.getTx()) < angleTolerance)
+                && (Math.abs(lastResult.getTy()) < angleTolerance);
     }
 
     @Override
     public void end(boolean interrupted) {
         driveTrain.stop();
+        if (addTelemetry) {
+            telemetry.addLine("Done");
+        }
     }
 }

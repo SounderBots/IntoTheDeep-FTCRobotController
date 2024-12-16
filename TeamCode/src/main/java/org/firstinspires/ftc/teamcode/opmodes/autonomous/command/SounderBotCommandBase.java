@@ -59,9 +59,13 @@ public abstract class SounderBotCommandBase extends CommandBase {
 
     }
 
-    private boolean isTimeout() {
-        long timeUsed = System.currentTimeMillis() - startTime;
-        return timeUsed > TIME_OUT_MS;
+    protected boolean isTimeout() {
+        if (!isDebugging()) {
+            long timeUsed = System.currentTimeMillis() - startTime;
+            return timeUsed > TIME_OUT_MS;
+        } else {
+            return false;
+        }
     }
 
     protected abstract void doExecute();
@@ -87,5 +91,9 @@ public abstract class SounderBotCommandBase extends CommandBase {
             // ok to be interrupted
             Log.i(LOG_TAG, "sleep interrupted");
         }
+    }
+
+    protected boolean isDebugging() {
+        return false;
     }
 }

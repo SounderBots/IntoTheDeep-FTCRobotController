@@ -60,7 +60,13 @@ public class DeliverySlider extends SonicSubsystemBase {
 
     private Direction currentDirection;
 
-    public DeliverySlider(HardwareMap hardwareMap, GamepadEx gamepad, Telemetry telemetry, DriverFeedback feedback) {
+    private DeliveryPivot deliveryPivot;
+
+    private double pivotPositionAtStartOfExpansion = 0;
+    private double positionAtStartOfExpansion = 0;
+    private double clawHeightAtStartOfExpansion = 0;
+
+    public DeliverySlider(HardwareMap hardwareMap, DeliveryPivot pivot, GamepadEx gamepad, Telemetry telemetry, DriverFeedback feedback) {
         /* instantiate motors */
         this.motor  = new Motor(hardwareMap, "Slider1");
         this.motor2  = new Motor(hardwareMap, "Slider2");
@@ -77,6 +83,7 @@ public class DeliverySlider extends SonicSubsystemBase {
         //MoveToTransferPosition();
 
         pidController = new SonicPIDFController(0.01, 0, 0, 0.05);
+        this.deliveryPivot = pivot;
     }
 
     private void SetTelop() {
@@ -97,6 +104,9 @@ public class DeliverySlider extends SonicSubsystemBase {
 
     public void expand() {
         SetTelop();
+        pivotPositionAtStartOfExpansion = deliveryPivot.getCurrentPosition();
+        positionAtStartOfExpansion = motor.getCurrentPosition();
+        clawHeightAtStartOfExpansion = Math.sin(DeliveryPivot.getAngleOfPosition(pivotPositionAtStartOfExpansion)) * positionAtStartOfExpansion;
         if (pivotLowEnoughSupplier != null) {
             double limit = pivotLowEnoughSupplier.get() ? ExtendLimit : BasketDeliveryPosition;
             if (pivotLowEnoughSupplier.get()) {
@@ -134,7 +144,7 @@ public class DeliverySlider extends SonicSubsystemBase {
         currentTarget = ExtendLimit + 50;
     }
 
-    public void MoveToDeliverySpecimanPosition() {
+    public void MoveToDeliverySpecimenPosition() {
         SetAuto();
         currentTarget = StartPosition;
     }

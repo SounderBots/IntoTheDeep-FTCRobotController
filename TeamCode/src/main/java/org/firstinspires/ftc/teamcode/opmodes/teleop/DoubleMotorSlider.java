@@ -21,7 +21,7 @@ public class DoubleMotorSlider extends OpModeTemplate {
     public void initialize() {
         super.initialize();
 
-        DeliverySlider deliverySlider = new DeliverySlider(hardwareMap, driverGamepad, null, null);
+        DeliverySlider deliverySlider = new DeliverySlider(hardwareMap,  null, driverGamepad, null, null);
 
         // Delivery Slider
         new Trigger(() -> gamepad2.left_stick_y > 0.5)

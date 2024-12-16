@@ -34,7 +34,7 @@ public abstract class CommandAutoOpMode extends CommandOpMode {
         AutoMecanumDriveTrain driveTrain = new AutoMecanumDriveTrain(hardwareMap, driverGamePad, telemetry, null, limeLight);
         RollingIntake rollingIntake = barebone ? null : new RollingIntake(hardwareMap, operatorGamePad, telemetry, feedback);
         DeliveryPivot pivot = barebone ? null : new DeliveryPivot(hardwareMap, operatorGamePad, telemetry, feedback, rollingIntake);
-        DeliverySlider slider = barebone ? null : new DeliverySlider(hardwareMap, operatorGamePad, telemetry, feedback);
+        DeliverySlider slider = barebone ? null : new DeliverySlider(hardwareMap, pivot, operatorGamePad, telemetry, feedback);
 
         commandFactory = new CommandFactory(telemetry, driveTrain, rollingIntake, limeLight, pivot,slider);
         schedule(createCommand());

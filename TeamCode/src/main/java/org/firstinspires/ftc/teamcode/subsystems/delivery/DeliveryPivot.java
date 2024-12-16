@@ -143,6 +143,11 @@ public class DeliveryPivot extends SonicSubsystemBase {
         this.currentTarget =100;
     }
 
+    public void autoToPosition(int position) {
+        SetAuto();
+        this.currentTarget = position;
+    }
+
     double previousPosition = -1000000.0;
 
     @Override
@@ -266,5 +271,15 @@ public class DeliveryPivot extends SonicSubsystemBase {
 
     public void resetEncoder() {
         motor.resetEncoder();
+    }
+
+    public static double getAngleOfPosition(double position) {
+        final double angle0 = IntakePositionFromStart;
+        final double angle90 = DeliveryPositionFromStart;
+        return (position - angle0) / (angle90 - angle0) * Math.PI / 2;
+    }
+
+    public double getCurrentPosition() {
+        return motor.getCurrentPosition();
     }
 }

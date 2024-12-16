@@ -33,7 +33,7 @@ public class MainTeleop extends OpModeTemplate {
         DriverFeedback feedback = new DriverFeedback(hardwareMap, driverGamepad, operatorGamepad, telemetry);
         RollingIntake rollingIntake = new RollingIntake(hardwareMap, operatorGamepad, telemetry, feedback);
         DeliveryPivot deliveryPivot = new DeliveryPivot(hardwareMap, operatorGamepad, telemetry, feedback, rollingIntake);
-        DeliverySlider deliverySlider = new DeliverySlider(hardwareMap, operatorGamepad, telemetry, feedback);
+        DeliverySlider deliverySlider = new DeliverySlider(hardwareMap, deliveryPivot, operatorGamepad, telemetry, feedback);
         deliverySlider.setPivotLowEnoughSupplier(deliveryPivot::lowEnoughToLimitSlider);
 
         //LimeLight limeLight = new LimeLight(hardwareMap, telemetry);
@@ -120,7 +120,7 @@ public class MainTeleop extends OpModeTemplate {
         operatorGamepad.getGamepadButton(GamepadKeys.Button.LEFT_BUMPER)
                 .whenPressed(new ParallelCommandGroup(
                                 new InstantCommand(deliveryPivot::AutoToStart, deliveryPivot),
-                                new InstantCommand(deliverySlider::MoveToDeliverySpecimanPosition, deliverySlider),
+                                new InstantCommand(deliverySlider::MoveToDeliverySpecimenPosition, deliverySlider),
                                 new InstantCommand(rollingIntake::SetElbowInSpecimenDeliveryPosition, rollingIntake)
                 ));
 

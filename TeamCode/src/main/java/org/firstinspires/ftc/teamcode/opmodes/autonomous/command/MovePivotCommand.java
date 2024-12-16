@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.opmodes.autonomous.command;
 
+import android.util.Log;
+
 import com.arcrobotics.ftclib.hardware.motors.Motor;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -8,6 +10,7 @@ import org.firstinspires.ftc.teamcode.util.SonicPIDFController;
 
 public class MovePivotCommand extends SounderBotCommandBase{
 
+    private static final String LOG_TAG = MovePivotCommand.class.getSimpleName();
     DeliveryPivot pivot;
     Telemetry telemetry;
     double target;
@@ -26,7 +29,7 @@ public class MovePivotCommand extends SounderBotCommandBase{
 
     @Override
     protected boolean isTargetReached() {
-        return Math.abs(target - position) < 40 || position == previousPosition;
+        return Math.abs(target - position) < 40;// || position == previousPosition;
     }
 
     @Override
@@ -37,6 +40,7 @@ public class MovePivotCommand extends SounderBotCommandBase{
     @Override
     public void doExecute() {
         position = motor.encoder.getPosition();
+        Log.i(LOG_TAG, "pivot position: " + position);
         double power = pidController.calculatePIDAlgorithm(target - position);
         if (isTargetReached()) {
             motor.set(0);
@@ -54,5 +58,10 @@ public class MovePivotCommand extends SounderBotCommandBase{
         }
 
         previousPosition = position;
+    }
+
+    @Override
+    protected boolean isDebugging() {
+        return true;
     }
 }
