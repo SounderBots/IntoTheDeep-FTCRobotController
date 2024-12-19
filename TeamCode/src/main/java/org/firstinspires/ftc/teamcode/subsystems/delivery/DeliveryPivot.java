@@ -17,6 +17,7 @@ import org.firstinspires.ftc.teamcode.subsystems.intake.RollingIntake;
 import org.firstinspires.ftc.teamcode.util.SonicPIDFController;
 
 public class DeliveryPivot extends SonicSubsystemBase {
+    private static final double HALF_PI = Math.PI / 2;
 
     private Motor motor;
 
@@ -34,6 +35,7 @@ public class DeliveryPivot extends SonicSubsystemBase {
 
     public static int IntakePositionFromStart = -1825;
 
+    // not used in prod
     private int SampleIntakePositionFromStart = -1490;
 
     private int SliderCheckLimit = 625;
@@ -155,6 +157,11 @@ public class DeliveryPivot extends SonicSubsystemBase {
         this.currentTarget = IntakePositionFromStart;
     }
 
+    public void autoToTarget(double target) {
+        SetAuto();
+        this.currentTarget = Double.valueOf(target).intValue();
+    }
+
     public void AutoToStart() {
         SetAuto();
         this.currentTarget =100;
@@ -259,6 +266,7 @@ public class DeliveryPivot extends SonicSubsystemBase {
         }
     }
 
+    // not used in prod
     public void MoveToIntakeSampleInAuto() {
         double position = motor.encoder.getPosition();
 
@@ -289,5 +297,14 @@ public class DeliveryPivot extends SonicSubsystemBase {
 
     public int getPosition() {
         return motor.getCurrentPosition();
+    }
+
+    public double angleFromIntake() {
+        return (double)(getPosition() - IntakePositionFromStart) /
+                (double)(DeliveryPositionFromStart - IntakePositionFromStart) * HALF_PI;
+    }
+
+    public double getPositionFromAngle(double angle) {
+        return angle / HALF_PI * (DeliveryPositionFromStart - IntakePositionFromStart) + IntakePositionFromStart;
     }
 }

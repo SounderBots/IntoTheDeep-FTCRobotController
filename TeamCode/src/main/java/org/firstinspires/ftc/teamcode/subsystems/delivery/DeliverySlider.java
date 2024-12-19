@@ -53,6 +53,10 @@ public class DeliverySlider extends SonicSubsystemBase {
 
     private Supplier<Boolean> pivotLowEnoughSupplier;
 
+    private Runnable teleopPeriodicCallback;
+
+    private Direction currentDirection;
+
     public DeliverySlider(HardwareMap hardwareMap, GamepadEx gamepad, Telemetry telemetry, DriverFeedback feedback) {
         /* instantiate motors */
         this.motor  = new Motor(hardwareMap, "Slider1");
@@ -72,6 +76,11 @@ public class DeliverySlider extends SonicSubsystemBase {
         pidController = new SonicPIDFController(0.005, 0, 0, 0.05);
     }
 
+    public DeliverySlider withTeleopPeriodicCallback(Runnable teleopPeriodicCallback) {
+        this.teleopPeriodicCallback = teleopPeriodicCallback;
+        return this;
+    }
+
     private void SetTelop() {
         this.isTeleop = true;
     }
@@ -80,8 +89,13 @@ public class DeliverySlider extends SonicSubsystemBase {
         this.isTeleop = false;
     }
 
+    public Direction getCurrentDirection() {
+        return currentDirection;
+    }
+
     public void collapse() {
         SetTelop();
+        currentDirection = Direction.COLLAPSE;
         motor.set(.6);
         motor2.set(-.6);
 
@@ -89,6 +103,7 @@ public class DeliverySlider extends SonicSubsystemBase {
 
     public void expand() {
         SetTelop();
+        currentDirection = Direction.EXPANDING;
         if (pivotLowEnoughSupplier != null
                 && pivotLowEnoughSupplier.get()) {
             motor.set(-.5);
@@ -204,6 +219,10 @@ public class DeliverySlider extends SonicSubsystemBase {
                 motor2.stopMotor();
                 currentTarget = BasketDeliveryPosition;
             }
+
+            if (teleopPeriodicCallback != null) {
+                teleopPeriodicCallback.run();
+            }
         }
 
         //telemetry.update();
@@ -269,5 +288,9 @@ public class DeliverySlider extends SonicSubsystemBase {
 
     public double getPosition() {
         return motor.getCurrentPosition();
+    }
+
+    public double getCurrentLength() {
+        return Math.abs(getPosition() - CollapsedPosition);
     }
 }

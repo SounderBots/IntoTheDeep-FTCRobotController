@@ -10,6 +10,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.command.SounderBotBaseRunCommand;
 import org.firstinspires.ftc.teamcode.opmodes.OpModeTemplate;
+import org.firstinspires.ftc.teamcode.opmodes.autonomous.command.CommandFactory;
 import org.firstinspires.ftc.teamcode.opmodes.autonomous.command.MovePivotRelativelyCommand;
 import org.firstinspires.ftc.teamcode.subsystems.climb.HangingArm;
 import org.firstinspires.ftc.teamcode.subsystems.delivery.DeliveryPivot;
@@ -30,14 +31,19 @@ public class MainTeleop extends OpModeTemplate {
     private static final String LOG_TAG = MainTeleop.class.getSimpleName();
     private TeleFourWheelMecanumDriveTrain driveTrain;
 
+    DeliveryPivot deliveryPivot;
+    DeliverySlider deliverySlider;
+
+    boolean extending = false;
+
     @Override
     public void initialize() {
         super.initialize();
 
         DriverFeedback feedback = new DriverFeedback(hardwareMap, driverGamepad, operatorGamepad, telemetry);
         RollingIntake rollingIntake = new RollingIntake(hardwareMap, operatorGamepad, telemetry, feedback);
-        DeliveryPivot deliveryPivot = new DeliveryPivot(hardwareMap, operatorGamepad, telemetry, feedback, rollingIntake);
-        DeliverySlider deliverySlider = new DeliverySlider(hardwareMap, operatorGamepad, telemetry, feedback);
+        deliveryPivot = new DeliveryPivot(hardwareMap, operatorGamepad, telemetry, feedback, rollingIntake);
+        deliverySlider = new DeliverySlider(hardwareMap, operatorGamepad, telemetry, feedback).withTeleopPeriodicCallback(this::adjustPivotForIntake);
         deliverySlider.setPivotLowEnoughSupplier(deliveryPivot::lowEnoughToLimitSlider);
         //LimeLight limeLight = new LimeLight(hardwareMap, telemetry);
         HangingArm hangingArm = new HangingArm(hardwareMap, telemetry, driverGamepad, feedback);
@@ -148,8 +154,8 @@ public class MainTeleop extends OpModeTemplate {
                 .whenReleased(new InstantCommand(hangingArm::hold, hangingArm));
 
         driverGamepad.getGamepadButton(GamepadKeys.Button.X)
-                .whenHeld(new InstantCommand(hangingArm::extend, hangingArm))
-                .whenReleased(new InstantCommand(hangingArm::hold, hangingArm));
+                .whenHeld(new InstantCommand(hangingArm::extend, hangingArm).andThen(new InstantCommand(this::recordExtendStartPosition)))
+                .whenReleased(new InstantCommand(hangingArm::hold, hangingArm).andThen(new InstantCommand(this::onExtendStopped)));
 
         // DRIVER Actions
 
@@ -213,5 +219,33 @@ public class MainTeleop extends OpModeTemplate {
 
     private void switchToMode(PowerMode powerMode) {
         driveTrain.setPowerRatio(powerMode.getPowerRatio());
+    }
+
+    double intakeHeightFromGround;
+    private void adjustPivotForIntake() {
+        if (!deliveryPivot.lowEnoughToLimitSlider()) {
+            return;
+        }
+
+        double targetSliderLen = deliverySlider.getCurrentLength();
+        double targetPivotAngleSin = intakeHeightFromGround / targetSliderLen;
+        double targetPivotAngle = Math.asin(targetPivotAngleSin);
+        double targetPivotPosition = deliveryPivot.getPositionFromAngle(targetPivotAngle);
+        Log.i(LOG_TAG, String.format("intakeHeightFromGround = %f, targetSliderLen = %f, " +
+                "targetPivotAngleSin = %f, targetPivotAngle = %f, targetPivotPosition = %f",
+                intakeHeightFromGround, targetSliderLen, targetPivotAngleSin, targetPivotAngle, targetPivotPosition));
+        deliveryPivot.autoToTarget(targetPivotPosition);
+    }
+
+    private void recordExtendStartPosition() {
+        if (!extending) {
+            intakeHeightFromGround = Math.sin(deliveryPivot.angleFromIntake()) *
+                    deliverySlider.getCurrentLength();
+            extending = true;
+        }
+    }
+
+    private void onExtendStopped() {
+        extending = false;
     }
 }
