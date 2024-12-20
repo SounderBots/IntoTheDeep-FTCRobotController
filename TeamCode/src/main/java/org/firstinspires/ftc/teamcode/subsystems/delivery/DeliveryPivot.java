@@ -38,7 +38,7 @@ public class DeliveryPivot extends SonicSubsystemBase {
     // not used in prod
     private int SampleIntakePositionFromStart = -1490;
 
-    private int SliderCheckLimit = 625;
+    private int SliderCheckLimit = 480;//625;
 
     public static int StartPositionFromStart = 0;
 

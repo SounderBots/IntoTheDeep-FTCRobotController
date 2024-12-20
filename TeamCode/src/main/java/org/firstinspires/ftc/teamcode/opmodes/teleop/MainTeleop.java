@@ -99,8 +99,14 @@ public class MainTeleop extends OpModeTemplate {
                 .whenInactive(new InstantCommand(deliverySlider::Hold, deliverySlider));
 
         new Trigger(() -> gamepad2.left_stick_y < -0.5)
-                .whenActive(new InstantCommand(deliverySlider::expand, deliverySlider))
-                .whenInactive(new InstantCommand(deliverySlider::Hold, deliverySlider));
+                .whenActive(new InstantCommand(() ->{
+                    deliverySlider.expand();
+                    recordExtendStartPosition();
+                }, deliverySlider))
+                .whenInactive(new InstantCommand(() -> {
+                    deliverySlider.Hold();
+                    onExtendStopped();
+                }, deliverySlider));
 
         // Intake and Outtake
 
@@ -154,8 +160,8 @@ public class MainTeleop extends OpModeTemplate {
                 .whenReleased(new InstantCommand(hangingArm::hold, hangingArm));
 
         driverGamepad.getGamepadButton(GamepadKeys.Button.X)
-                .whenHeld(new InstantCommand(hangingArm::extend, hangingArm).andThen(new InstantCommand(this::recordExtendStartPosition)))
-                .whenReleased(new InstantCommand(hangingArm::hold, hangingArm).andThen(new InstantCommand(this::onExtendStopped)));
+                .whenHeld(new InstantCommand(hangingArm::extend, hangingArm))
+                .whenReleased(new InstantCommand(hangingArm::hold, hangingArm));
 
         // DRIVER Actions
 
@@ -223,7 +229,8 @@ public class MainTeleop extends OpModeTemplate {
 
     double intakeHeightFromGround;
     private void adjustPivotForIntake() {
-        if (!deliveryPivot.lowEnoughToLimitSlider()) {
+        Log.i(LOG_TAG, "adjustPivotForIntake run, extending = " + extending + ", pivot position = " + deliveryPivot.getPosition());
+        if (!deliveryPivot.lowEnoughToLimitSlider() || !extending) {
             return;
         }
 
