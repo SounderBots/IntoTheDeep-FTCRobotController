@@ -122,6 +122,10 @@ public class CommandFactory {
         return new MoveSliderCommand(slider, telemetry, DeliverySlider.BasketDeliveryPosition - 20, DeliverySlider.Direction.EXPANDING);
     }
 
+    public Command extendSlider(boolean hold) {
+        return new MoveSliderCommand2(slider, telemetry, DeliverySlider.BasketDeliveryPosition - 20, DeliverySlider.Direction.EXPANDING, hold);
+    }
+
     public MoveSliderCommand extendSlider(Supplier<Boolean> endHoldingSignalProvider) {
         return new MoveSliderCommand(slider, telemetry, DeliverySlider.BasketDeliveryPosition, DeliverySlider.Direction.EXPANDING).withEndAction(new MoveSliderCommand.EndAction(endHoldingSignalProvider));
     }
@@ -148,6 +152,10 @@ public class CommandFactory {
 
     public MoveSliderCommand collapseSlider() {
         return new MoveSliderCommand(slider, telemetry, DeliverySlider.CollapsedPosition, true, DeliverySlider.Direction.COLLAPSE);
+    }
+
+    public Command stopSlider() {
+        return new InstantCommand(() -> slider.setMotors(0));
     }
 
     public SleeperCommand waitFor(long timeInMs) {

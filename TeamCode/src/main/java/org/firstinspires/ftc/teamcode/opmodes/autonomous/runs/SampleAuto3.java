@@ -9,14 +9,20 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 import org.firstinspires.ftc.teamcode.opmodes.autonomous.base.CommandAutoOpMode;
 
-//@Autonomous
-public class SampleAuto extends CommandAutoOpMode {
+@Autonomous
+public class SampleAuto3 extends CommandAutoOpMode {
 
     boolean hold1End = false;
     boolean hold2End = false;
     boolean hold3End = false;
 
     boolean inMatch = true;
+
+    @Config
+    public static class Sample2DeliveryDriveTarget {
+        public static int targetX = 200;
+        public static int targetY = 475;
+    }
 
     @Config
     public static class Sample3Config {
@@ -132,9 +138,10 @@ public class SampleAuto extends CommandAutoOpMode {
                     commandFactory.pivotToDelivery()
                 ),
 
-                commandFactory.driveToTarget(300, 400, 0, 0.13, .8, 10),
+                commandFactory.driveToTarget(SampleAuto3.Sample2DeliveryDriveTarget.targetX, SampleAuto3.Sample2DeliveryDriveTarget.targetY, -45, 0.13, .8, 10),
+//                commandFactory.driveToTarget(300, 400, 0, 0.13, .8, 10),
                 commandFactory.extendSlider(),
-                commandFactory.driveToTarget(5, 475, -45, 0.13, .8, 10),
+//                commandFactory.driveToTarget(5, 475, -45, 0.13, .8, 10),
 
 
                 // Sample #2

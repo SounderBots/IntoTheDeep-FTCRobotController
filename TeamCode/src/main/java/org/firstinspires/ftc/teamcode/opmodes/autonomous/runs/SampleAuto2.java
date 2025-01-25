@@ -10,7 +10,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import org.firstinspires.ftc.teamcode.opmodes.autonomous.base.CommandAutoOpMode;
 
 //@Autonomous
-public class SampleAuto extends CommandAutoOpMode {
+public class SampleAuto2 extends CommandAutoOpMode {
 
     boolean hold1End = false;
     boolean hold2End = false;
@@ -19,6 +19,18 @@ public class SampleAuto extends CommandAutoOpMode {
     boolean inMatch = true;
 
     @Config
+    public static class SampleCommonConfig {
+        public static double drive_minPower = .3;
+        public static double drive_maxPower = .8;
+        public static double drive_distanceTolerance = 80;
+    }
+
+    @Config
+    public static class Sample2DeliveryDriveTarget {
+        public static int targetX = 200;
+        public static int targetY = 475;
+    }
+//    @Config
     public static class Sample3Config {
 
         public static int beforeIntakeDrive_targetX = 230;
@@ -107,11 +119,11 @@ public class SampleAuto extends CommandAutoOpMode {
                 commandFactory.driveToTarget(10, 450, -45, 0.13, .5, 10),
 
                 // Sample #1
-                skipIntakeSample1 ? commandFactory.doNothing() : commandFactory.outtake().andThen(new InstantCommand(() -> hold2End = true),
+                skipIntakeSample1 ? commandFactory.doNothing() : commandFactory.outtake().andThen(new InstantCommand(() -> hold1End = true)),
                 //endregion for sample #1
 
                 //region sample #2
-                commandFactory.driveToTarget(490, 520, 0, 0.13, .5, 5)),
+                commandFactory.driveToTarget(490, 520, 0, 0.13, .5, 5),
 
                 new ParallelCommandGroup(
                     commandFactory.collapseSlider(),
@@ -132,13 +144,15 @@ public class SampleAuto extends CommandAutoOpMode {
                     commandFactory.pivotToDelivery()
                 ),
 
-                commandFactory.driveToTarget(300, 400, 0, 0.13, .8, 10),
+                commandFactory.driveToTarget(Sample2DeliveryDriveTarget.targetX, Sample2DeliveryDriveTarget.targetY, -45, 0.13, .8, 10),
                 commandFactory.extendSlider(),
-                commandFactory.driveToTarget(5, 475, -45, 0.13, .8, 10),
+//                commandFactory.driveToTarget(300, 400, 0, 0.13, .8, 10),
+//                commandFactory.extendSlider(true),
+//                commandFactory.driveToTarget(5, 475, -45, 0.13, .8, 10),
 
 
                 // Sample #2
-                skipIntakeSample2 ? commandFactory.doNothing() : commandFactory.outtake().andThen(new InstantCommand(() -> hold3End = true)),
+                skipIntakeSample2 ? commandFactory.doNothing() : commandFactory.outtake().andThen(new InstantCommand(() -> hold2End = true)),
                 //endregion sample #2
 
                 //region sample #3
