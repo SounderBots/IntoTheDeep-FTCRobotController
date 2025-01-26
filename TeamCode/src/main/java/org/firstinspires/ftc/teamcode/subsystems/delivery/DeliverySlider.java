@@ -17,6 +17,7 @@ import java.util.function.Supplier;
 @Config
 public class DeliverySlider extends SonicSubsystemBase {
 
+    private static final String LOG_TAG = DeliverySlider.class.getSimpleName();
     public enum Direction {
         EXPANDING (-1),
         COLLAPSE (1);
@@ -202,7 +203,7 @@ public class DeliverySlider extends SonicSubsystemBase {
                     && pivotLowEnoughSupplier.get()
                     && Math.abs(motor.get()) > 0
                     && position > ExtendLimit) {
-
+                    Log.i(LOG_TAG, "slider is limited by extend limit at " + ExtendLimit);
                     motor.stopMotor();
                     motor2.stopMotor();
                     MoveToValidPosition();
@@ -210,6 +211,7 @@ public class DeliverySlider extends SonicSubsystemBase {
 
             if (position > BasketDeliveryPosition &&
                      Math.abs(motor.get()) > 0){
+                Log.i(LOG_TAG, "slider reached to deliveryPosition at " + BasketDeliveryPosition);
                 motor.stopMotor();
                 motor2.stopMotor();
                 currentTarget = BasketDeliveryPosition;

@@ -166,7 +166,7 @@ public class DeliveryPivot extends SonicSubsystemBase {
         super.periodic();
 
         double position = motor.encoder.getPosition();
-        boolean addTelemetry = false;
+        boolean addTelemetry = true;
 
         if(addTelemetry) {
             telemetry.addData("pivot target", currentTarget);
