@@ -90,7 +90,7 @@ This line can simply be deleted , or commented out, to make the OpMode visible.
 
 
 
-## ADVANCED Multi-Team App management:  Cloning the TeamCode Module
+## ADVANCED Multi-Team App management:  Cloning the TeamCode Modules
 
 In some situations, you have multiple teams in your club and you want them to all share
 a common code organization, with each being able to *see* the others code but each having
